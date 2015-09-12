@@ -51,6 +51,7 @@ script/console
 ## For the future
 
 - Add an interface to display all this data.
+- Find a better way to "hack" the Wakatime plugins. If the plugin gets updated, we may loose the hack and loose some events in the meanwhile.
 
 ## TODO
 
