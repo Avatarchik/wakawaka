@@ -5,7 +5,7 @@ require 'highline/import'
 #  - ~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/
 module Wakawaka
   class Setup
-    WAKATIME_FILES_PATH_PATTERN = 'wakatime/base.py'
+    WAKATIME_FILES_PATH_PATTERNS = %w(wakatime/base.py wakatime/main.py)
     WAKATIME_URL = 'https://wakatime.com/api/v1/heartbeats'
     WAKAWAKA_PATH = '/wakatime_heartbeat'
 
@@ -16,6 +16,7 @@ module Wakawaka
         return
       end
 
+      # TODO: ignore .bak files!
       replacement_url = "#{replacement_domain}#{WAKAWAKA_PATH}"
       wakatime_files_to_override.each do |file|
         override_wakatime_file(file, replacement_url)
@@ -41,15 +42,14 @@ module Wakawaka
 
     private
 
+    # Searching wakatime/base.py and wakatime/main.py files,
+    # ignorying .pyc and .bak files.
     def self.wakatime_files_to_override
-      # TEMP
-      return [
-        '/Users/rchampourlier/.yadr/vim/bundle/vim-wakatime/plugin/packages/wakatime/base.py',
-        '/Users/rchampourlier/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/base.py'
-      ]
-      puts "Searching wakatime/base.py files"
-      command = "find ~ -path *#{WAKATIME_FILES_PATH_PATTERN}*|grep -v .pyc"
-      run_command(command).split("\n")
+      puts "Searching wakatime/base.py and wakatime/main.py files"
+      WAKATIME_FILES_PATH_PATTERNS.map do |pattern|
+        command = "find ~ -path *#{pattern}*|grep -v .pyc|grep -v .bak"
+        run_command(command).split("\n")
+      end.flatten
     end
 
     def self.override_wakatime_file(file, replacement_url)
@@ -70,7 +70,7 @@ module Wakawaka
 
     def self.ask_for_replacement_domain
       puts 'Please enter your Wakawaka domain. If you enter nothing, we\'ll do nothing.'
-      ask 'Your domain (no trailing /, for ex. http://mywakawaka.herokuapp.com): '
+      ask 'Your domain (no trailing /, for ex. http://wakahack.herokuapp.com): '
     end
 
     def self.run_command(command)
@@ -79,4 +79,3 @@ module Wakawaka
     end
   end
 end
-
